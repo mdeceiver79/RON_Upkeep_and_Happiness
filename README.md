@@ -24,3 +24,10 @@ Culture: More of an abstract notion this is more used to support the other featu
 Global Happiness: Overall measure of nation. If you are growing you will have good happiness, if you have taken lots of casualties , have have negative growth over a sustained period or don't have enough supplies to supply your army with upkeep you will suffer a happiness loss.
 
 Local Happiness: Each city has a happiness measure. If the city belongs to a different culture, is over crowded or far from your capital the city will suffer a loss of happiness. Low happiness (local happiness < 20) might lead to the city being damaged or a rebellion.
+
+Installation: 
+
+Copy file into a new folder in /Scenario/scripts
+
+You can then select the script as part of a quick battle config menu.
+You can tell the script has started by some green text saying: "Upkeep script loaded."
