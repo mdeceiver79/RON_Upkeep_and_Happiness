@@ -1,0 +1,924 @@
+// RON_Upkeep_and_Happiness
+// Author: Fulcrum
+// Desc : Adds features to Rise of nations
+// Version : 1.0
+  
+scenario {
+
+	static int sectimeoffset = 0;
+	static int DEBUG = 0;
+
+	// DESPOT = 0
+	// SENATE = 0
+	// MONARCH = 0
+	// REPUBLIC = 0
+	// SOCIALIST = 0
+	// CAPITALIST = 0
+	
+	static string NationAssign[]; // nation to index
+	static string NationNames[][]; // nation to array of nation names
+	static int NationCulture[]; // nation to culture
+	static string playerNameMap[]; // player to nation name
+	static string playerNationMap[]; // player to nation index
+	
+	NationAssign = ["aztecs","bantu","british","chinese","egyptians","french","germans","greeks","inca","japanese","koreans","maya","mongols","nubians","romans","russians","spanish","turks","americans","dutch","indians","iroquois","lakota","persian","default"];
+	NationNames[0] = ["Aztec"];
+	NationNames[1] = ["Bantu","Zulu"];
+	NationNames[2] = ["British","English"];
+	NationNames[3] = ["Chinese"];
+	NationNames[4] = ["Egyptian","Seljuk"];
+	NationNames[5] = ["French","Frankish"];
+	NationNames[6] = ["German","Germanic"];
+	NationNames[7] = ["Greek","Hellenic"];
+	NationNames[8] = ["Inca"];
+	NationNames[9] = ["Japanese"];
+	NationNames[10] = ["Korean"];
+	NationNames[11] = ["Mayan"];
+	NationNames[12] = ["Mongol","Hunnic"];
+	NationNames[13] = ["Nubian","Kushite"];
+	NationNames[14] = ["Roman","Italian","Latin"];
+	NationNames[15] = ["Russian"];
+	NationNames[16] = ["Spanish","Catalonian","Portugese"];
+	NationNames[17] = ["Turkish","Ottoman"];
+	NationNames[18] = ["American"];
+	NationNames[19] = ["Dutch"];
+	NationNames[20] = ["Indian"];
+	NationNames[21] = ["Iroquois"];
+	NationNames[22] = ["Lakotan"];
+	NationNames[23] = ["Persian","Iranian"];
+	NationNames[24] = ["Test"];
+	NationCulture = [3,5,1,4,2,1,1,1,3,4,4,3,4,5,1,1,1,2,1,1,2,3,3,2,0];
+	
+	
+	string politicDefault[][];
+	politicDefault[0][0] = "Kingdom";
+	politicDefault[0][1] = "Empire";
+	politicDefault[1][0] = "Republic";
+	politicDefault[1][1] = "League";
+	politicDefault[2][0] = "Kingdom";
+	politicDefault[2][1] = "Empire";
+	politicDefault[3][0] = "Republic";
+	politicDefault[3][1] = "Confederation";
+	politicDefault[4][0] = "Socialist Republic";
+	politicDefault[4][1] = "Union";
+	politicDefault[4][0] = "Democratic Republic";
+	politicDefault[4][1] = "Commonwealth";
+	
+	string politicRussian[][];
+	politicRussian[0][0] = "Tzardom";
+	politicRussian[0][1] = "Empire";
+	politicRussian[1][0] = "Governate";
+	politicRussian[1][1] = "Republic";
+	politicRussian[2][0] = "Tzardom";
+	politicRussian[2][1] = "Empire";
+	politicRussian[3][0] = "Republic";
+	politicRussian[3][1] = "Confederation";
+	politicRussian[4][0] = "Socialist Republic";
+	politicRussian[4][1] = "Bloc";
+	politicRussian[4][0] = "Democratic Republic";
+	politicRussian[4][1] = "Federation";
+	
+	string politicMongol[][];
+	politicMongol[0][0] = "Khanate";
+	politicMongol[0][1] = "Dynasty";
+	politicMongol[1][0] = "Governate";
+	politicMongol[1][1] = "Empire";
+	politicMongol[2][0] = "Khanate";
+	politicMongol[2][1] = "Dynasty";
+	politicMongol[3][0] = "Republic";
+	politicMongol[3][1] = "Confederation";
+	politicMongol[4][0] = "People's Republic";
+	politicMongol[4][1] = "Bloc";
+	politicMongol[4][0] = "Republic";
+	politicMongol[4][1] = "Confederation";
+	
+	string politicGerman[][];
+	politicGerman[0][0] = "Kingdom";
+	politicGerman[0][1] = "Empire";
+	politicGerman[1][0] = "Republic";
+	politicGerman[1][1] = "Reich";
+	politicGerman[2][0] = "Kingdom";
+	politicGerman[2][1] = "Empire";
+	politicGerman[3][0] = "Republic";
+	politicGerman[3][1] = "Reich";
+	politicGerman[4][0] = "Socialist Republic";
+	politicGerman[4][1] = "Union";
+	politicGerman[4][0] = "Republic";
+	politicGerman[4][1] = "Federation";
+	
+	string politicTurk[][];
+	politicTurk[0][0] = "Despotate";
+	politicTurk[0][1] = "Khanate";
+	politicTurk[1][0] = "Republic";
+	politicTurk[1][1] = "Empire";
+	politicTurk[2][0] = "Sultanate";
+	politicTurk[2][1] = "Caliphate";
+	politicTurk[3][0] = "Republic";
+	politicTurk[3][1] = "Empire";
+	politicTurk[4][0] = "Socialist Republic";
+	politicTurk[4][1] = "Bloc";
+	politicTurk[4][0] = "Republic";
+	politicTurk[4][1] = "Commonwealth";
+	
+	string politicPersia[][];
+	politicPersia[0][0] = "Despotate";
+	politicPersia[0][1] = "Shahdom";
+	politicPersia[1][0] = "Governate";
+	politicPersia[1][1] = "Republic";
+	politicPersia[2][0] = "Shahdom";
+	politicPersia[2][1] = "Caliphate";
+	politicPersia[3][0] = "Republic";
+	politicPersia[3][1] = "Empire";
+	politicPersia[4][0] = "Socialist Republic";
+	politicPersia[4][1] = "Bloc";
+	politicPersia[4][0] = "Republic";
+	politicPersia[4][1] = "League";
+	
+	string politicNative[][];
+	politicNative[0][0] = "Despotate";
+	politicNative[0][1] = "Kingdom";
+	politicNative[1][0] = "People";
+	politicNative[1][1] = "Nation";
+	politicNative[2][0] = "Kingdom";
+	politicNative[2][1] = "Empire";
+	politicNative[3][0] = "Republic";
+	politicNative[3][1] = "Empire";
+	politicNative[4][0] = "Socialist Republic";
+	politicNative[4][1] = "Union";
+	politicNative[4][0] = "Republic";
+	politicNative[4][1] = "Nation";
+	
+	static int playerHappiness[] = [0,100,100,100,100,100,100,100,100];
+	static int playerLastScore[] = [0,0,0,0,0,0,0,0,0];
+	static int playerChangeInScore[] = [0,0,0,0,0,0,0,0,0];
+	static int playerCulture[] = [0,0,0,0,0,0,0,0,0];
+	static int playerLosses[] = [0,0,0,0,0,0,0,0,0];
+	static int playerLastUnitBuilt[] = [0,0,0,0,0,0,0,0,0];
+	
+	static string cityNames[];
+	static int cityHappiness[];
+	static int cityOwner[];
+	
+	static bool gunpowderDiscovered = false;
+	static bool industryDiscovered = false;
+	
+	run_once {
+	
+		for (n = 1; n <= num_players(); n++) { 	
+			set_leader_difficulty(n, rand_int(1,4));
+			playerNation = find_nation(n);
+			for ( m = 0; m < NationAssign.length; m++ ) {
+				if ( playerNation == NationAssign[m] ) {
+					playerNationMap[n] = m;
+					playerCulture[n] = NationCulture[m];
+					playerNameMap[n] = NationNames[m][rand_int(0, NationNames[m].length)];
+					break;
+				}
+			}
+			
+		}
+	
+		set_game_msg_color("GREEN");
+		print_game_msg("Upkeep script loaded.");
+		set_game_msg_color("WHITE");
+		enable_trigger("eventExec");
+		enable_trigger("unit_made_1");
+		set_timer("eventTime", 10);
+	}
+
+	// unit replacement section
+	for (n = 1; n <= num_players(); n++) { 	
+	
+		trigger unit_made_1 ( get_last_unit_built(n) != playerLastUnitBuilt[n] ) {
+			unitId = get_last_unit_built(n);
+			playerLastUnitBuilt[n] = unitId;
+			if ( unitId != -1 && rand_int( 1,10 ) == 5 ) {
+				//unit_category = unit_category( n, unitId );
+				replaceWith = "";
+				//print_game_msg( object_type( n, unitId )+" trained." );
+				switch ( object_type( n, unitId ) ) {
+					// **** Core Units ****
+					// light infantry
+					case "Slingers":					
+						replaceWith = "Javelineers";
+					break;
+					case "Javelineers":					
+						replaceWith = "Elite Javelineers";
+					break;
+					case "Elite Javelineers":
+						if ( gunpowderDiscovered ) {
+							replaceWith = "Arquebusiers";					
+						}
+					break;
+					case "Musketeers":	
+						if ( num_unit_category(n, "Sail") > num_type(n, "Continental Marines") ) {				
+							replaceWith = "Continental Marines";
+						} else if ( have_tech(n,"Monarchy") ) {
+							replaceWith = "Imperial Guard";
+						} else if ( have_tech(n,"Democracy") ) {
+							replaceWith = "Junkers";
+						}
+					break;
+					
+					// archers
+					case "Bowmen":					
+						replaceWith = "Archers";
+					break;
+					case "Archers":				
+						if ( playerCulture[n] == 3 ) {	
+							replaceWith = "Heavy Archers";						
+						} else {							
+							replaceWith = "Crossbowmen";
+						}
+					break;
+					
+					// heavy infantry
+					case "Hoplites":			
+						replaceWith = "Phalanx";
+					break;
+					case "Phalanx":			
+						replaceWith = "Pikemen";
+					break;
+					case "Pikemen":			
+						replaceWith = "Elite Pikemen";
+					break;
+					
+					// light horse 
+					case "Light Horse":			
+						replaceWith = "Light Cavalry";
+					break; 
+					case "Light Cavalry":			
+						replaceWith = "Elite Light Cavalry";
+					break;
+					case "Elite Light Cavalry":			
+						replaceWith = "Hussar";
+					break;
+					
+					// horse archer
+					case "Horse Archer":		
+						replaceWith = "Heavy Horse Archer";					
+					break;
+					case "Heavy Horse Archer":		
+						if ( gunpowderDiscovered ) {
+							replaceWith = "Dragoon";			
+						}
+					break;
+					
+					// heavy cav
+					case "Knight":				
+						replaceWith = "Heavy Knight";		
+					break;
+					case "Heavy Knight":				
+						replaceWith = "Cuirassier";		
+					break;
+					
+					// light ships
+					case "Bark":				
+						replaceWith = "Dromon";		
+					break;
+					case "Dromon":				
+						replaceWith = "Caravel";		
+					break;
+					case "Caravel":		
+						if ( gunpowderDiscovered ) {					
+							replaceWith = "Corvette";
+						}
+					break;
+					case "Corvette":				
+						replaceWith = "Sloop";		
+					break;
+					case "Sloop":	
+						if ( industryDiscovered ) {					
+							replaceWith = "Ironclad";
+						}	
+					break;
+					case "Destroyer":				
+						replaceWith = "Cruiser";		
+					break;
+					case "Cruiser":				
+						replaceWith = "Missile Cruiser";		
+					break;
+					
+					// fire ships
+					case "Fire Raft":				
+						replaceWith = "Heavy Fire Raft";		
+					break;
+					case "Heavy Fire Raft":				
+						replaceWith = "Fireship";		
+					break;
+					case "Fireship":				
+						replaceWith = "Heavy Fireship";		
+					break;
+					case "Submarine":				
+						replaceWith = "Attack Submarine";		
+					break;
+					case "Attack Submarine":				
+						replaceWith = "Nuclear Missile Sub";		
+					break;
+					
+					// heavy ships
+					case "Trireme":				
+						replaceWith = "Galley";		
+					break;
+					case "Galley":				
+						replaceWith = "Carrack";		
+					break;
+					case "Carrack":	
+						if ( gunpowderDiscovered ) {					
+							replaceWith = "Frigate";
+						}					
+					break;
+					case "Frigate":				
+						replaceWith = "Man o' War";		
+					break;
+					case "Man o' War":				
+						replaceWith = "Ship of the Line";		
+					break;
+					case "Dreadnought":				
+						replaceWith = "Battleship";		
+					break;
+					case "Battleship":				
+						replaceWith = "Advanced Battleship";		
+					break;
+					case "Advanced Battleship":				
+						replaceWith = "Aircraft Carrier";		
+					break;
+					
+					// siege 					
+					case "Trebuchet":				
+						if ( gunpowderDiscovered ) {					
+							replaceWith = "Bombard";
+						}	
+					break;
+					
+					// *** Custom Units ***
+					// aztecs
+					case "Atl-Atls":				
+						replaceWith = "Royal Atl-Atls";		
+					break;
+					case "Royal Atl-Atls":				
+						replaceWith = "Xopilli Atl-Atls";		
+					break;
+					case "Jaguar Infantry":				
+						replaceWith = "Jaguar Assault Infantry";		
+					break;
+					
+					// bantu
+					case "Umpakati":				
+						replaceWith = "Yangombi Umpakati";		
+					break;
+					case "Yangombi Umpakati":				
+						replaceWith = "Impi ";		
+					break;
+					
+					// british
+					case "Longbow":				
+						replaceWith = "King's Longbowmen";		
+					break;
+					case "King's Longbow":				
+						replaceWith = "King's Yeomanry";		
+					break;
+					
+					// chinese
+					case "Fire Lances":				
+						replaceWith = "Heavy Fire Lances";		
+					break;
+					
+					//egyptians
+					case "Light Camel":				
+						replaceWith = "Camel Warrior";		
+					break;
+					case "Camel Warrior":				
+						replaceWith = "Elite Camel Warrior";		
+					break;
+					
+					case "Chariot":				
+						replaceWith = "Heavy Chariot";		
+					break;
+					case "Mameluke":				
+						replaceWith = "Royal Mameluke";		
+					break;
+					
+					// french
+					case "Chevalier":
+						replaceWith = "Heavy Chevalier";	
+					break;
+					case "Horse Grenadier":
+						replaceWith = "Horse Guard Grenadier";	
+					break;
+					// germans
+					case "Solduri":
+						replaceWith = "Barbarian";	
+					break;
+					case "Barbarian":
+						replaceWith = "Vandal";	
+					break;
+					case "Vandal":
+						replaceWith = "Landsknecht";	
+					break;
+					// greeks
+					case "Companion":
+						replaceWith = "Royal Companion";	
+					break;
+					case "Royal Companion":
+						replaceWith = "Stratiotai";	
+					break;
+					case "Stratiotai":
+						replaceWith = "Royal Stratiotai";	
+					break;
+					
+					// inca
+					case "Inti Clubmen":
+						replaceWith = "Royal Inti Macemen";	
+					break;
+					case "Royal Inti Macemen":
+						replaceWith = "Elite Pikemen";	
+					break;
+					
+					// japanese
+					case "Ashigaru Spearmen":
+						replaceWith = "Bushi";	
+					break;
+					case "Bushi":
+						replaceWith = "Elite Bushi";	
+					break;
+					case "Elite Bushi":
+						replaceWith = "Samurai";	
+					break;
+					case "Samurai":
+						replaceWith = "Gun Samurai";	
+					break;
+					
+					// koreans
+					case "Hwarang":
+						replaceWith = "Elite Hwarang";	
+					break;
+					case "Elite Hwarang":
+						replaceWith = "Royal Hwarang";	
+					break;
+					case "Royal Hwarang":
+						replaceWith = "Elite Royal Hwarang";	
+					break;
+					
+					// maya
+					case "Balamob Slingers":
+						replaceWith = "Royal Balamob Slingers";	
+					break;
+					case "Royal Balamob Slingers":
+						replaceWith = "Eagle Balamob Slingers";	
+					break;
+					
+					// mongols
+					case "Nomad":
+						replaceWith = "Steppe Nomad";	
+					break;
+					case "Steppe Nomad":
+						replaceWith = "Horde";	
+					break;
+					case "Horde":
+						replaceWith = "Golden Horde";	
+					break;
+					
+					// nubians
+					case "Kushite Archers":
+						replaceWith = "Royal Kushite Archers";	
+					break;
+					case "Royal Kushite Archers":
+						replaceWith = "Apedemak Archers";	
+					break;
+					case "Camel Archer":
+						replaceWith = "Heavy Camel Archer";	
+					break;
+					case "Heavy Camel Archer":
+						if ( gunpowderDiscovered ) {
+							replaceWith = "Camel Raider";	
+						}
+					break;
+					case "Camel Raider":
+						replaceWith = "Camel Corps";	
+					break;
+					
+					// romans				
+					case "legions":
+						replaceWith = "Caesar's Legions";	
+					break;			
+					case "Caesar's legions":
+						replaceWith = "Praetorian Guards";	
+					break;
+					// russians
+									
+					case "Rusiny Lancer":
+						replaceWith = "Cossack";	
+					break;				
+					case "Cossack":
+						replaceWith = "Don Cossack";	
+					break;
+					
+					// spain
+								
+					case "Scutari":
+						replaceWith = "Royal Scutari";	
+					break;			
+					case "Tercios":
+						replaceWith = "Royal Tercios";	
+					break;
+					
+					// turks
+					case "Janissaries":
+						replaceWith = "Royal Janissaries";	
+					break;	
+					case "Basilica Bombard":
+						replaceWith = "Basilica Cannon";	
+					break;	
+					
+					// lakota
+					
+					case "Sunka Wakan":
+						replaceWith = "Eagle Feather Horse";	
+					break;
+					case "Eagle Feather Horse":
+						if ( gunpowderDiscovered ) {
+							replaceWith = "Musket Horse";	
+						}
+					break;
+					case "Musket Horse":
+						replaceWith = "Repeating Rifle Horse";	
+					break;
+					
+					// iroquois
+					case "Spearmen":
+						replaceWith = "Mohawk Spearmen";	
+					break;
+					case "Mohawk Spearmen":
+						replaceWith = "Heavy Mohawk Spearmen";	
+					break;
+					case "Heavy Mohawk Spearmen":
+						replaceWith = "Elite Mohawk Spearmen";	
+					break;
+					
+					// persian
+					
+					case "Immortals":
+						replaceWith = "Anusiya";	
+					break;
+					case "Anusiya":
+						replaceWith = "Athanatoi";	
+					break;
+					case "Athanatoi":
+						if ( gunpowderDiscovered ) {
+							replaceWith = "Arquebus Immortal";	
+						}
+					break;
+					
+					
+					
+				}
+				if ( replaceWith != "" ) {
+					x_int = object_position_x(n, unitId);	
+					y_int = object_position_y(n, unitId);
+					kill_unit_anim(n, unitId, 1);
+					new_unit = create_unit(n, x_int, y_int, replaceWith, 1);	
+				}
+			}
+			enable_trigger("unit_made_1");
+		}
+	}
+	
+	
+	// ticker, we do this every 30 seconds coz otherwise it would fuck shit up
+	trigger eventExec (timer_expired("eventTime")) {
+
+		set_timer("eventTime", 30);
+		enable_trigger("eventExec");
+
+
+		for (n = 1; n <= num_players(); n++) { 	
+		
+			if ( have_tech(n, "Gunpowder Age") ) {
+				gunpowderDiscovered = true;
+			}
+			if ( have_tech(n, "Industrial Age") ) {
+				industryDiscovered = true;
+			}
+		
+			cityCount = num_cities(n);					
+
+			// Do renaming shit
+			// first calculate size
+			politicSize = 0;
+			if ( cityCount > 10 || get_territory(n) > 100/num_players() ) {
+				politicSize = 1; // this means they're really big and bad
+			}
+			// next work out political alignment
+			politicAlign = 0;
+			if ( have_tech(n,"Capitalism") ) {
+				politicAlign = 5;
+			} else if ( have_tech(n,"Socialism") ) {
+				politicAlign =4;		
+			} else if ( have_tech(n,"Democracy") ) {
+				politicAlign = 3;		
+			} else if ( have_tech(n,"Monarchy") ) {
+				politicAlign = 2;
+			} else if ( have_tech(n,"Republic") ) {
+				politicAlign = 1;
+			}
+			switch (find_nation(n)) {
+				case "iroquois":
+				case "lakota":
+					set_leader_name(n, playerNameMap[n]+" "+politicNative[politicAlign][politicSize]);
+				break;
+				case "russians":
+					set_leader_name(n, playerNameMap[n]+" "+politicRussian[politicAlign][politicSize]);			
+				break;
+				case "mongols":
+					set_leader_name(n, playerNameMap[n]+" "+politicMongol[politicAlign][politicSize]);		
+				break;
+				case "germans":
+					set_leader_name(n, playerNameMap[n]+" "+politicGerman[politicAlign][politicSize]);		
+				break;
+				case "turkish":
+					set_leader_name(n, playerNameMap[n]+" "+politicTurk[politicAlign][politicSize]);		
+				break;
+				case "persians":
+					set_leader_name(n, playerNameMap[n]+" "+politicPersia[politicAlign][politicSize]);		
+				break;
+				default:
+				set_leader_name(n, playerNameMap[n]+" "+politicDefault[politicAlign][politicSize]);
+			
+			}
+		
+			// UPKEEP
+			
+			totalUnit 		= num_units(n);
+			totalFoot 		= num_unit_category(n,"Foot");
+			totalMounted 	= num_unit_category(n,"Mounted");
+			totalMech 		= num_unit_category(n,"Mech ");
+			totalArtillery 	= num_unit_category(n,"Artillery");
+			totalCommand 	= num_unit_category(n,"Command");
+			totalCivilian 	= num_unit_category(n,"Civilian");
+			totalSail 		= num_unit_category(n,"Sail");
+			totalNaval 		= num_unit_category(n,"Naval");
+			totalAir 		= num_unit_category(n,"Air");
+
+			ageModifier = 1+(age(n)/7);
+			//ageModifier = age();
+			totalFood 	= ageModifier*( totalUnit + totalMounted );
+			totalGold 	= ageModifier*2*( totalUnit - totalCivilian );
+			totalOil	= ageModifier*2*( totalMech + totalNaval + totalAir );
+			totalWood	= ageModifier*3*( totalSail + totalArtillery );
+
+
+			take_good( n, "Food", totalFood);
+			take_good( n, "Gold", totalGold);
+			take_good( n, "Oil", totalOil);
+			take_good( n, "Timber", totalWood);
+			
+			// GLOBAL HAPPINESS
+			// Negative modifiers
+			// Recession
+			// Famine
+			// Lots of losses (cancles war)
+			
+			// Positive Modifiers
+			// War!
+			// new city
+			
+			//neutral modifiers
+			// Churches vs city
+			// 
+			
+			float modifierRecession = 1.5; // people like growth
+			float modifierWar = 1;	// people like war
+			float modifierBroke = 1; // people dont like their taxes going to waste
+			float modifierFamine = 1; // people don't like starving
+	
+			if ( num_units_lost(n) > (playerLosses[n] + num_units( n )*0.1) && num_units( n ) > 20 ) {
+			modifierWar = 0.8; // people are unhappy if 10% of the population dies.
+			} else {
+				for (m = 1; m <= num_players(); m++) {
+					if ( have_war(n, m) ) {
+						modifierWar = 1.2; // people like war :(
+						break;
+					}
+				}
+			}
+			playerLosses[n] = num_units_lost(n);
+			
+			if ( playerLastScore[n] > score(n) ) {
+				playerChangeInScore[n] = playerChangeInScore[n] - 1;
+			} else {
+				if (playerChangeInScore[n] < 0) {
+					playerChangeInScore[n] = playerChangeInScore[n] + 1;
+				} else {
+					modifierRecession = 1;
+				}
+			}
+			if ( playerChangeInScore[n] < -3 ) {
+				if ( playerChangeInScore[n] < -10 ) {
+					modifierRecession = 0.1;
+				} else {
+					modifierRecession = 1 + ( playerChangeInScore[n] / 10 );
+				}
+			}
+			playerLastScore[n] = score(n);
+			if ( totalFood > num_type(n, "Food") ) {
+				modifierFamine = 0.5;
+			}
+			if ( totalGold > num_type(n, "Gold") ) {
+				modifierBroke = 0.8;
+			}
+
+		
+	
+			globalHappinessNormalised = (( playerHappiness[n] + ( 100 * modifierRecession * modifierWar * modifierFamine) )/2);
+			if (globalHappinessNormalised > 120) {
+				globalHappinessNormalised = 120; // dont want it going too high or shit hits da fan
+			}
+			playerHappiness[n] = (int)globalHappinessNormalised; // normalise the old happiness with the calcuted happiness
+			 
+			// LOCAL HAPPINESS
+			// neutral 
+			// Civilian/military ratio // Not yet finished
+			// global happiness
+			
+			//positive 
+			// spies
+			// general
+
+			// negative
+			// distance from capital			  
+			// different culture
+			
+			for (i =0; i < num_cities(n); i++) {
+				// we loop through all the players cities.
+				city_name = find_city_name(n);
+				city_uid = -1;
+				city_id = find_city_id(city_name);
+				city_x = object_position_x(n, city_id);
+				city_y = object_position_y(n, city_id);
+				city_level = get_city_level(city_name);
+				city_radius = 18+2*city_level;
+				for ( j = 0; j < cityNames.length; j++ ) {
+					if ( cityNames[j] == city_name ) {
+						city_uid = j;
+						break;
+					}
+				}
+				if (city_uid == -1) {
+					// city is not in memory
+					// renaming will cause a ruckus with this, but idgaf
+					city_uid = cityNames.length;
+					cityNames[city_uid] = city_name;
+					cityOwner[city_uid] = n;
+					cityHappiness[city_uid] = 100;
+				}
+				
+				// now the cities existance has been established the table storing all the cities its time to get down to business.
+				localHappiness = 100;
+				// first is military
+				if ( object_type_near( n, "general", 1, city_x, city_y, city_radius) == true ) {
+					localHappiness = localHappiness+20; // people like having a governer/general in town
+				}
+				if ( object_type_near( n, "spy", 1, city_x, city_y, city_radius) == true ) {
+					localHappiness = localHappiness+20; // secret police help keep the calm
+				}
+				if ( object_type_near( n, "farm", city_level, city_x, city_y, city_radius) == false && totalFood > num_type(n, "Food") ) {
+					localHappiness = localHappiness-40; // in a famine, if a city doesnt have farms the people go bonkers
+				}
+				if ( object_type_near( n, "temple", 1, city_x, city_y, city_radius) == true ) {
+					localHappiness = localHappiness+20; // secret police help keep the calm
+				}
+				if ( object_type_near( n, "fort", 1, city_x, city_y, city_radius) == true || object_type_near( n, "castle", 1, city_x, city_y, city_radius) == true || object_type_near( n, "fortress", 1, city_x, city_y, city_radius) == true || object_type_near( n, "reboubt", 1, city_x, city_y, city_radius) == true  ) {
+					localHappiness = localHappiness+40; // having a fort in town helps it peace
+				}
+				if ( cityOwner[city_uid] != n ) {
+					localHappiness = localHappiness - 20; // different owner makes people unhappy
+				}
+				if ( playerCulture[cityOwner[city_uid]] != playerCulture[n] ) {
+					localHappiness = localHappiness - 40; // different culture makes people very unhappy
+				}
+				city_population = 0;
+				city_buildings = city_level*3;
+				// for each building in city do
+				firstBuildingAtCity = -1; // we need this since there is no num_build_at_city function
+				for (m = 0; m < 7; m++) {
+					building_id = find_build_at_city(n, city_name, "Woodcutter's Camp",1);
+					if ( firstBuildingAtCity == building_id ) {
+						break;
+					}
+					if ( firstBuildingAtCity == -1 ) {
+						firstBuildingAtCity = building_id;
+					}
+					city_population = city_population + num_workers_at_building( n, building_id );
+					city_buildings = city_buildings + 3;
+				}
+				firstBuildingAtCity = -1; // we need this since there is no num_build_at_city function
+				for (m =0; m < 7; m++) {
+					building_id = find_build_at_city(n, city_name, "Mine",1);
+					if ( firstBuildingAtCity == building_id ) {
+						break;
+					}
+					if ( firstBuildingAtCity == -1 ) {
+						firstBuildingAtCity = building_id;
+					}
+					city_population = city_population + num_workers_at_building( n, building_id );
+					city_buildings = city_buildings + 3;
+				}
+				firstBuildingAtCity = -1; // we need this since there is no num_build_at_city function
+				for (m =0; m < 7; m++) {
+					building_id = find_build_at_city(n, city_name, "Farm",1);
+					if ( firstBuildingAtCity == building_id ) {
+						break;
+					}
+					if ( firstBuildingAtCity == -1 ) {
+						firstBuildingAtCity = building_id;
+					}
+					city_population = city_population + num_workers_at_building( n, building_id );
+					city_buildings = city_buildings + 1;
+				}
+
+				localHappiness = localHappiness + city_buildings - city_population; // over crowding brings unhappiness
+
+			
+				// distance
+				capital_id = find_city_id(find_capital(n));
+				capital_x = object_position_x(n, capital_id);	
+				capital_y = object_position_y(n, capital_id);
+				distance = sqrt( (capital_x - city_x)^2 + (capital_y - city_y)^2 );
+				if ( distance > get_map_size()/2 ) {
+					localHappiness = localHappiness - 40;
+				}
+				
+				localHappiness = (int)( localHappiness + playerHappiness[n] + cityHappiness[city_uid] )/3;	
+				
+				// 100+ is happy
+				// 50 is rioting/
+				if ( localHappiness > 100 ) {
+					// town is happy
+					
+					
+					
+				} else if ( localHappiness >50 ) {
+					// town is unhappy
+					if (is_human(n)) {
+						print_game_msg( city_name+" is unhappy." );
+					}
+					
+					
+				} else {
+					// town riots
+					// first check if we have war with original owner
+					if ( have_war(n, cityOwner[city_uid]) ) {
+						damage_object(n, city_id, 10);
+						// we have war with original owner, this lets us do riots!	
+						rebelCount = 0;
+						for ( j = 0; j < num_type(n, "Citizen"); j++ ) {
+							thisCitizen = find_unit( n, "citizen" );
+							if ( object_near_build( n, thisCitizen, n, city_id, 20 ) && !is_on_transport( n, thisCitizen ) ) {
+								civ_x = object_position_x( n, thisCitizen );
+								civ_y = object_position_y( n, thisCitizen );
+								newRebel = create_unit_upgrade(cityOwner[city_uid], civ_x, civ_y, "militia", 1);
+								unit_stance_order(cityOwner[city_uid], newRebel, "raid");
+								kill_unit_anim( n, thisCitizen, 1);
+								rebelCount++;
+							}
+							
+						}
+						if ((is_human(n) || is_human(cityOwner[city_uid])) && rebelCount > 0) {
+							print_game_msg( city_name+" has Revolted!" );
+						}
+					} else {
+						// no war with owner, need to blow shit up then
+						if (is_human(n)) {
+							print_game_msg( city_name+" is rioting!" );
+							damage_object(n, city_id, 10);
+						}
+					}
+					
+					
+				}
+			}
+			
+			if (is_human(n)) {				
+				print_game_msg("Happiness: "+playerHappiness[n]);
+				print_game_msg("Upkeep");
+				print_game_msg("Food: "+totalFood);
+				print_game_msg("Gold: "+totalGold);
+				print_game_msg("Oil: "+totalOil);
+				print_game_msg("Timber: "+totalWood);
+				// do trading stuff
+				for (m = 1; m <= num_players(); m++) {
+					if (have_trade(m,n) && rand_int(1,10) > 1 && get_territory(n) < 50) {
+						diplomacy_block_war(n,m);
+					} else {
+						diplomacy_enable_war(n,m);
+					}
+				}
+			}
+		}
+
+	}
+
+
+
+}
